@@ -1,6 +1,6 @@
 {
   "name": "sightradar",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Official Node.js / TypeScript client for the SightRadar face recognition API",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -21,10 +21,20 @@
   "keywords": [
     "face recognition",
     "facial recognition",
-    "sightradar",
+    "face recognition api",
+    "face detection",
+    "face search",
+    "face matching",
+    "face verification",
+    "face compare",
+    "aws rekognition alternative",
     "rekognition",
+    "sightradar",
+    "biometrics",
+    "computer vision",
+    "machine learning",
     "api",
-    "computer vision"
+    "typescript"
   ],
   "license": "MIT",
   "author": "SightRadar",
