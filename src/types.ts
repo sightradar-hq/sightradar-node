@@ -150,6 +150,15 @@ export interface ImageSource {
   photoId?: string;
 }
 
+/**
+ * An image plus the identity it belongs to, for selfie registration.
+ * `userId` is required by the API; `selfieId` optionally names this selfie.
+ */
+export interface SelfieSource extends ImageSource {
+  userId: string;
+  selfieId?: string;
+}
+
 export interface SearchOptions extends ImageSource {
   /** 512-d precomputed embedding (alternative to an image). */
   embedding?: number[];
