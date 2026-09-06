@@ -281,6 +281,10 @@ export class SightRadar {
       });
     }
     const payload = { ...imageBody(src), userId: src.userId } as Record<string, unknown>;
+    // imageBody() forwards photoId, which this endpoint does not accept and the
+    // multipart path above drops. Strip it so both paths send the same shape —
+    // the type omits it, but a plain-JS caller has no type to stop them.
+    delete payload.photoId;
     if (src.selfieId) payload.selfieId = src.selfieId;
     return this.request(path, { method: "POST", jsonBody: payload });
   }

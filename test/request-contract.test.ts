@@ -99,6 +99,23 @@ describe("registerSelfie", () => {
     expect(body.url).toBe("https://cdn.example.com/a.jpg");
   });
 
+  it("never forwards photoId, which this endpoint does not accept", async () => {
+    const { calls } = stubFetch({ point_id: "pt-stub" });
+    await client().registerSelfie("event-2026", {
+      url: "https://cdn.example.com/a.jpg",
+      userId: "user-42",
+      // A plain-JS caller has no type to stop them sending this.
+      photoId: "img-42",
+    } as never);
+
+    const body = JSON.parse(calls[0].body as string);
+    // imageBody() forwards photoId; the multipart path drops it. Both paths
+    // must agree, so the JSON path strips it too.
+    expect(body).not.toHaveProperty("photoId");
+    expect(body.userId).toBe("user-42");
+    expect(body.url).toBe("https://cdn.example.com/a.jpg");
+  });
+
   it("throws locally when userId is missing, without a round-trip", async () => {
     const { calls } = stubFetch();
     expect(() =>
