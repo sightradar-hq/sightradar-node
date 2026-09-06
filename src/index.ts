@@ -32,6 +32,7 @@ export type {
   ClientOptions,
   ImageSource,
   SearchOptions,
+  SelfieSource,
   CompareOptions,
   BatchOp,
   SubmitBatchOptions,

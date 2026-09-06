@@ -16,6 +16,7 @@ import type {
   ListWebhooksResult,
   RegisterWebhookOptions,
   SearchOptions,
+  SelfieSource,
   SearchResult,
   SubmitBatchOptions,
   VerifyWebhookSignatureOptions,
@@ -23,7 +24,7 @@ import type {
   Webhook,
 } from "./types.js";
 
-const VERSION = "1.0.2";
+const VERSION = "1.1.0";
 const DEFAULT_BASE_URL = "https://api.sightradar.com";
 
 // Retry only on these transient statuses when maxRetries > 0.
@@ -252,7 +253,7 @@ export class SightRadar {
     pointId: string,
     opts: { threshold?: number; limit?: number } = {},
   ): Promise<SearchResult> {
-    const payload: Record<string, unknown> = { id: pointId };
+    const payload: Record<string, unknown> = { pointId };
     if (opts.threshold !== undefined) payload.threshold = opts.threshold;
     if (opts.limit !== undefined) payload.limit = opts.limit;
     return normalizeSearch(
@@ -264,15 +265,28 @@ export class SightRadar {
   }
 
   /** Register a selfie point you can later search by id. */
-  registerSelfie(collectionId: string, src: ImageSource): Promise<Record<string, unknown>> {
+  registerSelfie(
+    collectionId: string,
+    src: SelfieSource,
+  ): Promise<Record<string, unknown>> {
+    if (!src.userId) throw new SightRadarError("registerSelfie requires userId");
     const path = `/v1/collections/${encodeURIComponent(collectionId)}/selfies`;
     if (src.file) {
       return this.request(path, {
         method: "POST",
-        body: this.multipart(src.file, src.filename, { photoId: src.photoId }),
+        body: this.multipart(src.file, src.filename, {
+          userId: src.userId,
+          selfieId: src.selfieId,
+        }),
       });
     }
-    return this.request(path, { method: "POST", jsonBody: imageBody(src) });
+    const payload = { ...imageBody(src), userId: src.userId } as Record<string, unknown>;
+    // imageBody() forwards photoId, which this endpoint does not accept and the
+    // multipart path above drops. Strip it so both paths send the same shape —
+    // the type omits it, but a plain-JS caller has no type to stop them.
+    delete payload.photoId;
+    if (src.selfieId) payload.selfieId = src.selfieId;
+    return this.request(path, { method: "POST", jsonBody: payload });
   }
 
   // -- stateless ops --------------------------------------------------------

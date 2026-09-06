@@ -150,6 +150,20 @@ export interface ImageSource {
   photoId?: string;
 }
 
+/**
+ * An image plus the identity it belongs to, for selfie registration.
+ *
+ * `userId` is required by the API; `selfieId` optionally names this selfie.
+ * `photoId` is deliberately omitted: the selfies endpoint does not accept it,
+ * so inheriting it from {@link ImageSource} would advertise a field that the
+ * multipart path drops while the JSON path forwarded — two paths disagreeing
+ * on the same call.
+ */
+export interface SelfieSource extends Omit<ImageSource, "photoId"> {
+  userId: string;
+  selfieId?: string;
+}
+
 export interface SearchOptions extends ImageSource {
   /** 512-d precomputed embedding (alternative to an image). */
   embedding?: number[];
